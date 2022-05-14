@@ -1,5 +1,6 @@
 package edu.hitsz.aircraft;
 
+import edu.hitsz.application.GameActivity;
 import edu.hitsz.basic.EnemyInstance;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.factory.AbstractItemFactory;
@@ -27,7 +28,7 @@ public class BossEnemy extends AbstractAircraft{
     public void forward() {
         super.forward();
 
-        if(locationY >= Main.WINDOW_HEIGHT) {
+        if(locationY >= GameActivity.screenHeight) {
             vanish();
         }
     }

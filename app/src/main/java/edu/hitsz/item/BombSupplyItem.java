@@ -2,7 +2,7 @@ package edu.hitsz.item;
 
 import edu.hitsz.aircraft.AbstractAircraft;
 import edu.hitsz.application.Game;
-import edu.hitsz.application.MusicThread;
+import edu.hitsz.application.GameActivity;
 import edu.hitsz.basic.EnemyInstance;
 import edu.hitsz.bullet.BaseBullet;
 
@@ -41,17 +41,20 @@ public class BombSupplyItem extends AbstractItem {
     public void itemFunction() {
         updateAll();
         System.out.println("BombSupply active!");
+        /*
         if(Main.bgmFlag) {
             MusicThread tBomb = new MusicThread("src/videos/bomb_explosion.wav");
             tBomb.start();
         }
+
+         */
     }
 
     @Override
     public void forward() {
         super.forward();
         // 判定 y 轴向下飞行出界
-        if (locationY >= Main.WINDOW_HEIGHT || locationY <= 0) {
+        if (locationY >= GameActivity.screenHeight || locationY <= 0) {
             speedY = -speedY;
         }
     }

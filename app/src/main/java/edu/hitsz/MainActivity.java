@@ -21,8 +21,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getScreenHW();
+        // getScreenHW();
         Intent intent = new Intent(this, GameActivity.class);
+        // Log.i(TAG, "MainActivity Runing. And it's running for game.");
         startActivity(intent);
     }
 

@@ -1,6 +1,7 @@
 package edu.hitsz.item;
 
 import edu.hitsz.aircraft.HeroAircraft;
+import edu.hitsz.application.GameActivity;
 
 public class HealingItem extends AbstractItem {
     private int healHp = 30; //治疗恢复血量数值
@@ -19,7 +20,7 @@ public class HealingItem extends AbstractItem {
     public void forward() {
         super.forward();
         // 判定 y 轴向下飞行出界
-        if (locationY >= Main.WINDOW_HEIGHT || locationY <= 0) {
+        if (locationY >= GameActivity.screenHeight || locationY <= 0) {
             speedY = -speedY;
         }
     }

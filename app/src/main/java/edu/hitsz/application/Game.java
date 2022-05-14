@@ -44,7 +44,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
      */
     private int timeInterval = 40;
 
-    private final HeroAircraft heroAircraft;
+    public final HeroAircraft heroAircraft;
     public static List<AbstractAircraft> enemyAircrafts;
     private final List<BaseBullet> heroBullets;
     public static List<BaseBullet> enemyBullets;
@@ -87,8 +87,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     boolean bossGenerationFlag = true;
 
-    MusicThread bgmThread = new MusicThread("src/videos/bgm.wav");
-    MusicThread bossThread = new MusicThread("src/videos/bgm_boss.wav");
+    // MusicThread bgmThread = new MusicThread("src/videos/bgm.wav");
+    // MusicThread bossThread = new MusicThread("src/videos/bgm_boss.wav");
 
     boolean mbLoop = false; //控制绘画线程的标志位
     private SurfaceHolder mSurfaceHolder;
@@ -124,9 +124,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             }
         };
         executorService = new ScheduledThreadPoolExecutor(1, gameThread);
-
-        //启动英雄机鼠标监听
-        new HeroController(this, heroAircraft);
     }
 
     @Override
@@ -136,9 +133,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             synchronized (mSurfaceHolder){
                 draw();
             }
-            try {
-                Thread.sleep(200);
-            } catch (Exception e){ }
         }
     }
     @Override
@@ -147,8 +141,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        MainActivity.screenWidth = width;
-        MainActivity.screenHeight = height;
+        GameActivity.screenWidth = width;
+        GameActivity.screenHeight = height;
     }
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
