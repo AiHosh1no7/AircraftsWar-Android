@@ -17,7 +17,7 @@ public class EnemyStraightStrategy implements Strategy{
 
         BaseBullet baseBullet;
         for(int i = 0; i < shootNum; i++) {
-            baseBullet = new EnemyBullet(x + (i*2 - shootNum + 1)*10, y, bulletSpeedX, bulletSpeedY, power);
+            baseBullet = new EnemyBullet(x + (i*2 - shootNum + 1)*50, y, bulletSpeedX, bulletSpeedY, power);
             res.add(baseBullet);
         }
 

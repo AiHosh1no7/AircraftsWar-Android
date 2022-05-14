@@ -17,7 +17,7 @@ public class HeroStraightStrategy implements Strategy{
 
         BaseBullet baseBullet;
         for(int i = 0; i < shootNum; i++) {
-            baseBullet = new HeroBullet(x + (i*2 - shootNum + 1)*10, y, bulletSpeedX, bulletSpeedY, power);
+            baseBullet = new HeroBullet(x + (i * 2 - shootNum + 1) * 100, y, bulletSpeedX, bulletSpeedY, power);
             res.add(baseBullet);
         }
 

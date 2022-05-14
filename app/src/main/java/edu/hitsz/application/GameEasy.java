@@ -15,6 +15,7 @@ public class GameEasy extends Game{
 
     public void difficultyEvolve(){}
     public void generateEnemy() {
+        System.out.println("Generation Flag: " + mobGenerationFlag);
         if(eliteGenerationFlag == eliteGenerationLimit) {
             eliteGenerationFlag = 0;
             if(enemyAircrafts.size() < enemyMaxNumber) {

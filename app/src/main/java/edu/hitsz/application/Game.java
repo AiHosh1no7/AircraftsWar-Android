@@ -429,7 +429,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
-        canvas.drawBitmap(ImageManager.BACKGROUND_IMAGE, 0, this.backGroundTop - GameActivity.screenHeight, mPaint);
+        canvas.drawBitmap(ImageManager.BACKGROUND_IMAGE, 0, this.backGroundTop - ImageManager.BACKGROUND_IMAGE.getHeight(), mPaint);
         canvas.drawBitmap(ImageManager.BACKGROUND_IMAGE, 0, this.backGroundTop, mPaint);
 
         backGroundTop += 1;
@@ -457,20 +457,21 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
-        for (AbstractFlyingObject object : objects) {
-            Bitmap image = object.getImage();
+        for (int i = 0; i < objects.size(); i++) {
+            Bitmap image = objects.get(i).getImage();
             assert image != null : objects.getClass().getName() + " has no image! ";
-            canvas.drawBitmap(image, object.getLocationX() - image.getWidth() / 2,
-                    object.getLocationY() - image.getHeight() / 2, mPaint);
+            canvas.drawBitmap(image, objects.get(i).getLocationX() - image.getWidth() / 2,
+                    objects.get(i).getLocationY() - image.getHeight() / 2, mPaint);
         }
     }
 
     private void paintScoreAndLife() {
-        int x = 10;
-        int y = 25;
-        mPaint.setColor(16711680);
-        canvas.drawText("SCORE:" + this.score, x, y, mPaint);
+        int x = 100;
+        int y = 250;
+        Paint textPaint = new Paint();
+        textPaint.setColor(16711680);
+        canvas.drawText("SCORE:" + this.score, x, y, textPaint);
         y = y + 20;
-        canvas.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, mPaint);
+        canvas.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, textPaint);
     }
 }

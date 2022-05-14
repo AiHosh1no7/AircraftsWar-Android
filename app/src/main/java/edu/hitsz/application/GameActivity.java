@@ -38,6 +38,7 @@ public class GameActivity extends AppCompatActivity {
         vGame = new GameEasy(this);
         System.out.println("Game Activity has been created.");
         setContentView(vGame);
+        vGame.action();
     }
 
     @Override
