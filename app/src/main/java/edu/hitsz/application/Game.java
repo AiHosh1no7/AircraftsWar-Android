@@ -105,8 +105,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         heroAircraft = HeroAircraft.getInstance();
         heroAircraft.setStatus(
-                GameActivity.screenWidth / 2,
-                GameActivity.screenHeight - ImageManager.HERO_IMAGE.getHeight() ,
+                MainActivity.screenWidth / 2,
+                MainActivity.screenHeight - ImageManager.HERO_IMAGE.getHeight() ,
                 0, 0, 1000);
 
         enemyAircrafts = new LinkedList<>();
@@ -141,8 +141,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        GameActivity.screenWidth = width;
-        GameActivity.screenHeight = height;
+        MainActivity.screenWidth = width;
+        MainActivity.screenHeight = height;
     }
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
@@ -434,7 +434,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         backGroundTop += 1;
 
-        if(backGroundTop == GameActivity.screenHeight) {
+        if(backGroundTop == MainActivity.screenHeight) {
             backGroundTop = 0;
         }
 
@@ -466,12 +466,15 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void paintScoreAndLife() {
-        int x = 100;
-        int y = 250;
+        int x = 10;
+        int y = 100;
         Paint textPaint = new Paint();
-        textPaint.setColor(16711680);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setStrokeWidth(12);
+        textPaint.setTextSize(80);
+        textPaint.setColor(Color.parseColor("red"));
         canvas.drawText("SCORE:" + this.score, x, y, textPaint);
-        y = y + 20;
+        y = y + 100;
         canvas.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, textPaint);
     }
 }

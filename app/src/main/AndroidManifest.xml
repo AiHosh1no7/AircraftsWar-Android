@@ -9,8 +9,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AircraftWarAndroid">
         <activity
-            android:name=".application.GameActivity"
-            android:exported="false" />
+            android:name=".LauncherActivity"
+            android:exported="true"
+            android:label="@string/title_activity_launcher"
+            android:theme="@style/Theme.AircraftWarAndroid.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">

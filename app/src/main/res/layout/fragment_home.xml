@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/diffGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="182dp">
+
+            <RadioButton
+                android:id="@+id/easyButton"
+                style="@android:style/Widget.Material.Light.CompoundButton.RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="20sp"
+                android:text="EASY"
+                android:textAlignment="viewStart"
+                android:textSize="34sp"
+                android:typeface="serif" />
+
+            <RadioButton
+                android:id="@+id/mediumButton"
+                style="@android:style/Widget.Material.CompoundButton.RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:lineSpacingExtra="20sp"
+                android:text="MEDIUM"
+                android:textAlignment="viewStart"
+                android:textSize="34sp"
+                android:typeface="serif" />
+
+            <RadioButton
+                android:id="@+id/hardButton"
+                style="@android:style/Widget.Material.CompoundButton.RadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="20sp"
+                android:text="HARD"
+                android:textAlignment="viewStart"
+                android:textSize="34sp"
+                android:typeface="serif" />
+        </RadioGroup>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <Switch
+            android:id="@+id/audioSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="97dp"
+            android:text="Audio"
+            android:textSize="34sp"
+            android:typeface="sans" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

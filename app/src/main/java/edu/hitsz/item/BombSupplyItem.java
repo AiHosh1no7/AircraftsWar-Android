@@ -1,8 +1,8 @@
 package edu.hitsz.item;
 
+import edu.hitsz.MainActivity;
 import edu.hitsz.aircraft.AbstractAircraft;
 import edu.hitsz.application.Game;
-import edu.hitsz.application.GameActivity;
 import edu.hitsz.basic.EnemyInstance;
 import edu.hitsz.bullet.BaseBullet;
 
@@ -54,7 +54,7 @@ public class BombSupplyItem extends AbstractItem {
     public void forward() {
         super.forward();
         // 判定 y 轴向下飞行出界
-        if (locationY >= GameActivity.screenHeight || locationY <= 0) {
+        if (locationY >= MainActivity.screenHeight || locationY <= 0) {
             speedY = -speedY;
         }
     }

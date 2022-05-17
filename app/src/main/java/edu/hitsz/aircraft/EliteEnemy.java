@@ -1,6 +1,6 @@
 package edu.hitsz.aircraft;
 
-import edu.hitsz.application.GameActivity;
+import edu.hitsz.MainActivity;
 import edu.hitsz.basic.EnemyInstance;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.factory.AbstractItemFactory;
@@ -36,7 +36,7 @@ public class EliteEnemy extends AbstractAircraft implements EnemyInstance {
     public void forward() {
         super.forward();
 
-        if(locationY >= GameActivity.screenHeight) {
+        if(locationY >= MainActivity.screenHeight) {
             vanish();
         }
     }

@@ -1,6 +1,6 @@
 package edu.hitsz.bullet;
 
-import edu.hitsz.application.GameActivity;
+import edu.hitsz.MainActivity;
 import edu.hitsz.basic.AbstractFlyingObject;
 import edu.hitsz.basic.EnemyInstance;
 
@@ -28,12 +28,12 @@ public class BaseBullet extends AbstractFlyingObject {
         super.forward();
 
         // 判定 x 轴出界
-        if (locationX <= 0 || locationX >= GameActivity.screenWidth) {
+        if (locationX <= 0 || locationX >= MainActivity.screenWidth) {
             vanish();
         }
 
         // 判定 y 轴出界
-        if (speedY > 0 && locationY >= GameActivity.screenHeight ) {
+        if (speedY > 0 && locationY >= MainActivity.screenHeight ) {
             // 向下飞行出界
             vanish();
         }else if (locationY <= 0){

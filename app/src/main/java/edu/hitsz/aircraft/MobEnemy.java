@@ -1,6 +1,6 @@
 package edu.hitsz.aircraft;
 
-import edu.hitsz.application.GameActivity;
+import edu.hitsz.MainActivity;
 import edu.hitsz.basic.EnemyInstance;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.factory.AbstractItemFactory;
@@ -38,7 +38,7 @@ public class MobEnemy extends AbstractAircraft implements EnemyInstance {
     public void forward() {
         super.forward();
         // 判定 y 轴向下飞行出界
-        if (locationY >= GameActivity.screenHeight) {
+        if (locationY >= MainActivity.screenHeight) {
             vanish();
         }
     }
