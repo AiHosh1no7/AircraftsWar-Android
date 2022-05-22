@@ -4,6 +4,8 @@ import edu.hitsz.MainActivity;
 import edu.hitsz.aircraft.HeroAircraft;
 
 public class HealingItem extends AbstractItem {
+    public boolean isBomb = false;
+
     private int healHp = 30; //治疗恢复血量数值
 
     public HealingItem(int locationX, int locationY, int speedX, int speedY) {

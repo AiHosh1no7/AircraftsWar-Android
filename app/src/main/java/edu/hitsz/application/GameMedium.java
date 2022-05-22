@@ -27,14 +27,12 @@ public class GameMedium extends Game{
 
     public void generateEnemy() {
         if(bossScore >= bossGenerationLimit && bossGenerationFlag) {
-            /*
-            if(bgmFlag) {
-                bossThread = new MusicThread("src/videos/bgm_boss.wav");
-                bossThread.start();
-                bossThread.setLoop(true);
-                bgmThread.over();
+            if(MainActivity.bgmFlag) {
+                stopMusic(bgmPlayer);
+                bossBgmPlayer.start();
+                bossBgmPlayer.setLooping(true);
             }
-             */
+
             bossGenerationFlag = false;
             bossScore -= 200;
             enemyAircrafts.add(bossFactory.createEnemy(

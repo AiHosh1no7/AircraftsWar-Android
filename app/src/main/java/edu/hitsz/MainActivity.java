@@ -4,13 +4,16 @@ import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.Window;
+import android.content.ServiceConnection;
 
 import edu.hitsz.aircraft.BossEnemy;
 import edu.hitsz.aircraft.EliteEnemy;
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static int screenHeight;
 
+    public static boolean bgmFlag;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
@@ -45,15 +50,18 @@ public class MainActivity extends AppCompatActivity {
         switch(prevIntent.getIntExtra("diff", 1)) {
             case 0:
                 ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+                bgmFlag = prevIntent.getBooleanExtra("audio", false);
                 vGame = new GameEasy(this);
                 System.out.println("EasyMode");
                 break;
             case 1:
                 ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg2);
+                bgmFlag = prevIntent.getBooleanExtra("audio", false);
                 vGame = new GameMedium(this);
                 break;
             case 2:
                 ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg3);
+                bgmFlag = prevIntent.getBooleanExtra("audio", false);
                 vGame = new GameHard(this);
                 break;
         }

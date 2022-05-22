@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BombSupplyItem extends AbstractItem {
+    public boolean isBomb = true;
+
     List<EnemyInstance> enemyList = new ArrayList<>();
 
     public void addEnemyInstance(EnemyInstance e) {
@@ -41,13 +43,6 @@ public class BombSupplyItem extends AbstractItem {
     public void itemFunction() {
         updateAll();
         System.out.println("BombSupply active!");
-        /*
-        if(Main.bgmFlag) {
-            MusicThread tBomb = new MusicThread("src/videos/bomb_explosion.wav");
-            tBomb.start();
-        }
-
-         */
     }
 
     @Override

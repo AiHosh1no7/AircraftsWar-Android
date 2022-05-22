@@ -6,6 +6,8 @@ import edu.hitsz.strategy.HeroSprayStrategy;
 import edu.hitsz.strategy.HeroStraightStrategy;
 
 public class FireSupplyItem extends AbstractItem {
+    public boolean isBomb = false;
+
     public FireSupplyItem(int locationX, int locationY, int speedX, int speedY) {
         super(locationX, locationY, speedX, speedY);
     }

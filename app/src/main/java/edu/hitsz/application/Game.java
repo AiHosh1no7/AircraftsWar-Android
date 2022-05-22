@@ -1,6 +1,7 @@
 package edu.hitsz.application;
 
 import edu.hitsz.MainActivity;
+import edu.hitsz.R;
 import edu.hitsz.aircraft.*;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.basic.AbstractFlyingObject;
@@ -19,7 +20,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioManager;
 import android.media.Image;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
+import android.provider.MediaStore;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -75,6 +80,11 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     int eliteGenerationFlag = 0;
     int mobGenerationFlag = 0;
 
+    MediaPlayer bgmPlayer;
+    MediaPlayer bossBgmPlayer;
+    private SoundPool mSoundPool;
+    private HashMap<Integer, Integer> soundID = new HashMap<Integer, Integer>();
+
     int shootPeriodFlag = 0;
     int shootPeriodLimit = 5;
     int bossScore = 0;
@@ -87,9 +97,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     boolean bossGenerationFlag = true;
 
-    // MusicThread bgmThread = new MusicThread("src/videos/bgm.wav");
-    // MusicThread bossThread = new MusicThread("src/videos/bgm_boss.wav");
-
     boolean mbLoop = false; //控制绘画线程的标志位
     private SurfaceHolder mSurfaceHolder;
     private Canvas canvas;  //绘图的画布
@@ -97,6 +104,14 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     public Game(Context context) {
         super(context);
+        bgmPlayer = MediaPlayer.create(context, R.raw.bgm);
+        bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
+        mSoundPool = new SoundPool(4, AudioManager.STREAM_SYSTEM, 5);
+        soundID.put(1, mSoundPool.load(context, R.raw.bullet_hit, 1));
+        soundID.put(2, mSoundPool.load(context, R.raw.game_over, 1));
+        soundID.put(3, mSoundPool.load(context, R.raw.bomb_explosion, 1));
+        soundID.put(4, mSoundPool.load(context, R.raw.bullet, 1));
+        soundID.put(5, mSoundPool.load(context, R.raw.get_supply, 1));
         mbLoop = true;
         mPaint = new Paint();  //设置画笔
         mSurfaceHolder = this.getHolder();
@@ -153,19 +168,44 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     public abstract void generateEnemy();
     public abstract void difficultyEvolve();
+
+    public static void stopMusic(MediaPlayer player) {
+        if (player != null) {
+            player.stop();
+            player.reset();//重置
+            player.release();//释放
+        }
+    }
+
+    public void playBullet(){
+        mSoundPool.play(soundID.get(4), 1, 1, 0,0,1);
+    }
+
+    public void playGameOver(){
+        mSoundPool.play(soundID.get(2), 1, 1, 0, 0, 1);
+    }
+
+    public void playBulletHit() {
+        mSoundPool.play(soundID.get(1), 1, 1, 0, 0, 1);
+    }
+
+    public void playBombExplosion() {
+        mSoundPool.play(soundID.get(3), 1, 1, 0, 0, 1);
+    }
+
+    public void playGetSupply() {
+        mSoundPool.play(soundID.get(5), 1, 1, 0, 0, 1);
+    }
+
     /**
      * 游戏启动入口，执行游戏逻辑
      */
     public void action() {
-        difficultyTag();
-/*
-        if(Main.bgmFlag) {
-            bgmThread.start();
-            bgmThread.setLoop(true);
+        if(MainActivity.bgmFlag) {
+            bgmPlayer.start();
+            bgmPlayer.setLooping(true);
         }
-
-
- */
+        difficultyTag();
         // 定时任务：绘制、对象产生、碰撞判定、击毁及结束判定
         Runnable task = () -> {
 
@@ -194,21 +234,15 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             // 后处理
             postProcessAction();
 
-            //每个时刻重绘界面
-            //repaint();
-
             // 游戏结束检查
             if (heroAircraft.getHp() <= 0) {
                 // 游戏结束
-                /*
-                if(bgmFlag) {
-                    bgmThread.over();
-                    MusicThread gameOverThread = new MusicThread("src/videos/game_over.wav");
-                    gameOverThread.setLoop(false);
-                    gameOverThread.start();
-                }
 
-                 */
+                if(MainActivity.bgmFlag) {
+                    stopMusic(bgmPlayer);
+                    stopMusic(bossBgmPlayer);
+                    playGameOver();
+                }
 
                 executorService.shutdown();
                 gameOverFlag = true;
@@ -250,12 +284,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         }
         // 英雄射击
         heroBullets.addAll(heroAircraft.shoot());
-        /*
-        if(bgmFlag) {
-            MusicThread bulletShootThread = new MusicThread("src/videos/bullet.wav");
-            bulletShootThread.start();
+        if(MainActivity.bgmFlag) {
+            playBullet();
         }
-        */
     }
 
     private void bulletsMoveAction() {
@@ -295,14 +326,11 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
             if(heroAircraft.crash(bullet)) {
                 heroAircraft.decreaseHp(bullet.getPower());
-                /*
-                if(bgmFlag) {
-                    MusicThread bulletHitThread = new MusicThread("src/videos/bullet_hit.wav");
-                    bulletHitThread.start();
+
+                if(MainActivity.bgmFlag) {
+                    playBulletHit();
                 }
                 bullet.vanish();
-
-                 */
             }
         }
 
@@ -320,13 +348,11 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 if (enemyAircraft.crash(bullet)) {
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
-                    /*
-                    if(bgmFlag) {
-                        MusicThread bulletHitThread = new MusicThread("src/videos/bullet_hit.wav");
-                        bulletHitThread.start();
+
+                    if(MainActivity.bgmFlag) {
+                        playBulletHit();
                     }
 
-                     */
                     enemyAircraft.decreaseHp(bullet.getPower());
                     bullet.vanish();
                     if (enemyAircraft.notValid()) {
@@ -343,14 +369,13 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                         }
                         if(enemyAircraft.bossFlag) {
                             bossGenerationFlag = true;
-                            /*
-                            if(bgmFlag) {
-                                bossThread.over();
-                                bgmThread = new MusicThread("src/videos/bgm.wav");
-                                bgmThread.start();
+
+                            if(MainActivity.bgmFlag) {
+                                stopMusic(bossBgmPlayer);
+                                bgmPlayer.start();
+                                bgmPlayer.setLooping(true);
                             }
 
-                             */
                             difficultyEvolve();
                         }
 
@@ -385,13 +410,13 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             }
 
             if(heroAircraft.crash(item)) {
-                /*
-                if(bgmFlag) {
-                    MusicThread getSupplyThread = new MusicThread("src/videos/get_supply.wav");
-                    getSupplyThread.start();
+
+                if(MainActivity.bgmFlag && !item.isBomb) {
+                    playGetSupply();
+                } else if(MainActivity.bgmFlag && item.isBomb) {
+                    playBombExplosion();
                 }
 
-                 */
                 item.itemFunction();
                 item.vanish();
             }
