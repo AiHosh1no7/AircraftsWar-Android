@@ -2,6 +2,7 @@ package edu.hitsz.application;
 
 import edu.hitsz.MainActivity;
 import edu.hitsz.R;
+import edu.hitsz.RankActivity;
 import edu.hitsz.aircraft.*;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.basic.AbstractFlyingObject;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -27,6 +29,8 @@ import android.media.SoundPool;
 import android.provider.MediaStore;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -63,14 +67,15 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     int enemyMaxNumber = 5;
 
-    private boolean gameOverFlag = false;
+    public boolean gameOverFlag = false;
 
     int bossHp = 1500;
     double bossHpRate = 1.5;
     int mobHp = 100;
     int eliteHp = 200;
-    private int score = 0;
+    public int score = 0;
     private int time = 0;
+    Context context;
     /**
      * 周期（ms)
      * 指示子弹的发射、敌机的产生频率
@@ -104,6 +109,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     public Game(Context context) {
         super(context);
+        this.context = context;
         bgmPlayer = MediaPlayer.create(context, R.raw.bgm);
         bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
         mSoundPool = new SoundPool(4, AudioManager.STREAM_SYSTEM, 5);
@@ -243,10 +249,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                     stopMusic(bossBgmPlayer);
                     playGameOver();
                 }
-
                 executorService.shutdown();
                 gameOverFlag = true;
                 System.out.println("Game Over!");
+                Toast.makeText(context, "GAME OVER!\nTouch to continue.", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -501,5 +507,18 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText("SCORE:" + this.score, x, y, textPaint);
         y = y + 100;
         canvas.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, textPaint);
+    }
+
+    private void paintGameOver() {
+        int x = MainActivity.screenWidth / 2;
+        int y = MainActivity.screenHeight / 2;
+        Paint textPaint = new Paint();
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setStrokeWidth(12);
+        textPaint.setTextSize(200);
+        textPaint.setColor(Color.parseColor("red"));
+        canvas.drawText("GAME OVER", x, y, textPaint);
+        y = y + 500;
+        canvas.drawText("Touch to continue.", x, y, textPaint);
     }
 }

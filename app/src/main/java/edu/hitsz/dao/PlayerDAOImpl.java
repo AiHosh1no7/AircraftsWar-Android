@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.hitsz.MainActivity;
+import edu.hitsz.strategy.Context;
+
 public class PlayerDAOImpl implements PlayerDAO{
     private static List<Player> playerList = new LinkedList<>();
 
@@ -20,8 +23,9 @@ public class PlayerDAOImpl implements PlayerDAO{
                 Player player = (Player) ois.readObject();
                 playerList.add(player);
             }
-        } catch(EOFException e) {
-
+        } catch(FileNotFoundException e) {
+            savePlayerList();
+            e.printStackTrace();
         } catch(Exception e) {
             e.printStackTrace();
         }

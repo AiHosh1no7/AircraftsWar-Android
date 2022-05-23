@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_MOVE) {
+        if(event.getAction() == MotionEvent.ACTION_MOVE && !vGame.gameOverFlag) {
             double x = event.getX();
             double y = event.getY();
 
@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
             }
             vGame.heroAircraft.setLocation(x, y);
             Log.i(TAG, "Now HeroAircraft Location:" + vGame.heroAircraft.getLocationX() + " " + vGame.heroAircraft.getLocationY());
+        } else if(vGame.gameOverFlag) {
+            Intent showRank = new Intent(MainActivity.this, RankActivity.class);
+            showRank.putExtra("currentScore", vGame.score);
+            startActivity(showRank);
         }
 
         return true;
@@ -120,5 +124,9 @@ public class MainActivity extends AppCompatActivity {
         ImageManager.CLASSNAME_IMAGE_MAP.put(HealingItem.class.getName(), ImageManager.HEALING_ITEM_IMAGE);
         ImageManager.CLASSNAME_IMAGE_MAP.put(BombSupplyItem.class.getName(), ImageManager.BOMB_ITEM_IMAGE);
         ImageManager.CLASSNAME_IMAGE_MAP.put(FireSupplyItem.class.getName(), ImageManager.BULLET_ITEM_IMAGE);
+    }
+
+    public void gameOver(int score) {
+        Intent showRank = new Intent(MainActivity.this, RankActivity.class);
     }
 }
