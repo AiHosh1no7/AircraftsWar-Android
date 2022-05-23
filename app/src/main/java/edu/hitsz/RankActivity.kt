@@ -1,13 +1,21 @@
 package edu.hitsz
 
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import edu.hitsz.dao.Player
-import edu.hitsz.strategy.Context
+import edu.hitsz.databinding.ActivityRankBinding
+import edu.hitsz.databinding.RegisterDialogBinding
 import java.io.*
 import java.util.*
+
 
 class RankActivity : AppCompatActivity() {
     private val playerList: MutableList<Player> = LinkedList()
@@ -73,7 +81,47 @@ class RankActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rank)
-        val prevIntent: Intent = getIntent()
+        val prevIntent: Intent = intent
+        val scoreThisTime = prevIntent.getIntExtra("score",-1)
+        val playerID = prevIntent.getStringExtra("id")
         readPlayerList()
+
+        if(scoreThisTime != -1) {
+            addPlayer(playerID, scoreThisTime)
+        }
+
+        val scoreTable = findViewById<TableLayout>(R.id.rankTable)
+
+        for(player in playerList) {
+            val newRow = TableRow(this@RankActivity)
+
+            val playerIndex = TextView(this@RankActivity)
+            playerIndex.text = (playerList.indexOf(player) + 1).toString()
+            newRow.addView(playerIndex)
+
+            val playerID = TextView(this@RankActivity)
+            playerID.text = player.playerName
+            newRow.addView(playerID)
+
+            val playerScore = TextView(this@RankActivity)
+            playerScore.text = player.score.toString()
+            newRow.addView(playerScore)
+
+            val playerDate = TextView(this@RankActivity)
+            playerDate.text = player.dateTime
+            newRow.addView(playerDate)
+
+            scoreTable.addView(newRow,TableLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT
+            ))
+        }
+
+        savePlayerList()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        savePlayerList()
     }
 }
+

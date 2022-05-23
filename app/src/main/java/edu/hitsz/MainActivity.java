@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             vGame.heroAircraft.setLocation(x, y);
             Log.i(TAG, "Now HeroAircraft Location:" + vGame.heroAircraft.getLocationX() + " " + vGame.heroAircraft.getLocationY());
         } else if(vGame.gameOverFlag) {
-            Intent showRank = new Intent(MainActivity.this, RankActivity.class);
+            Intent showRank = new Intent(MainActivity.this, InputActivity.class);
             showRank.putExtra("currentScore", vGame.score);
             startActivity(showRank);
         }

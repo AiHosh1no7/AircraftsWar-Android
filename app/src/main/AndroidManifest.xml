@@ -9,6 +9,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AircraftWarAndroid">
         <activity
+            android:name=".InputActivity"
+            android:exported="false" />
+        <activity
             android:name=".RankActivity"
             android:exported="false" />
         <activity

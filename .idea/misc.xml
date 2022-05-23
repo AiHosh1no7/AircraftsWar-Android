@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/activity_input.xml" value="0.4" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/activity_launcher.xml" value="0.39947916666666666" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/activity_rank.xml" value="0.39947916666666666" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/content_input.xml" value="0.39947916666666666" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/fragment_first.xml" value="0.39947916666666666" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/fragment_second.xml" value="0.39947916666666666" />
+        <entry key="..\:/Documents/Code/AircraftWar-Android/app/src/main/res/layout/register_dialog.xml" value="0.298828125" />
         <entry key="app/src/main/res/layout/activity_launcher.xml" value="0.13858695652173914" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.13858695652173914" />
         <entry key="app/src/main/res/layout/activity_rank.xml" value="0.1718882463980412" />
