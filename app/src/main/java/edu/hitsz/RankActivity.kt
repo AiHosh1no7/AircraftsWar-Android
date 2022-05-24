@@ -2,17 +2,12 @@ package edu.hitsz
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import edu.hitsz.dao.Player
-import edu.hitsz.databinding.ActivityRankBinding
-import edu.hitsz.databinding.RegisterDialogBinding
 import java.io.*
 import java.util.*
 
@@ -20,7 +15,7 @@ import java.util.*
 class RankActivity : AppCompatActivity() {
     private val playerList: MutableList<Player> = LinkedList()
 
-    fun readPlayerList() {
+    private fun readPlayerList() {
         playerList.clear()
         try {
             val fis = openFileInput("rank")
@@ -36,7 +31,7 @@ class RankActivity : AppCompatActivity() {
         }
     }
 
-    fun addPlayer(playerName: String?, score: Int) {
+    private fun addPlayer(playerName: String?, score: Int) {
         val newPlayer = Player(playerName, score)
         for (player in playerList) {
             if (player.score >= score) {
@@ -55,7 +50,7 @@ class RankActivity : AppCompatActivity() {
         savePlayerList()
     }
 
-    fun savePlayerList() {
+    private fun savePlayerList() {
         try {
             val fos = openFileOutput("rank", MODE_PRIVATE)
             val oos = ObjectOutputStream(fos)
@@ -110,6 +105,21 @@ class RankActivity : AppCompatActivity() {
             val playerDate = TextView(this@RankActivity)
             playerDate.text = player.dateTime
             newRow.addView(playerDate)
+
+            newRow.setOnClickListener {
+                val builder = AlertDialog.Builder(this@RankActivity)
+                builder.setTitle("删除记录")
+                builder.setMessage("确认删除该记录？")
+                builder.setPositiveButton("确认") { dialog, which ->
+                    val tableRow = it as TableRow
+                    scoreTable.removeView(tableRow)
+                    deletePlayer(playerList.indexOf(player))
+                }
+                builder.setNegativeButton("取消") { gialog, which ->
+                    return@setNegativeButton
+                }
+                builder.show()
+            }
 
             scoreTable.addView(newRow,TableLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.MATCH_PARENT
