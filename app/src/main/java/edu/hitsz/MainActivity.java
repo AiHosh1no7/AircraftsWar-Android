@@ -14,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.content.ServiceConnection;
+import android.widget.Toast;
 
 import edu.hitsz.aircraft.BossEnemy;
 import edu.hitsz.aircraft.EliteEnemy;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static boolean bgmFlag;
 
+    public static int diff;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         Intent prevIntent = getIntent();
         getScreenHW();
         loadImg();
-        switch(prevIntent.getIntExtra("diff", 1)) {
+        switch(diff = prevIntent.getIntExtra("diff", 1)) {
             case 0:
                 ImageManager.BACKGROUND_IMAGE = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
                 bgmFlag = prevIntent.getBooleanExtra("audio", false);
@@ -76,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             double x = event.getX();
             double y = event.getY();
 
-            Log.i(TAG, "x = " + x + " y = " + y);
+            // Log.i(TAG, "x = " + x + " y = " + y);
             if (x < 0 || x > screenWidth || y < 0 || y > screenHeight){
                 // 防止超出边界
                 return false;
@@ -124,9 +127,5 @@ public class MainActivity extends AppCompatActivity {
         ImageManager.CLASSNAME_IMAGE_MAP.put(HealingItem.class.getName(), ImageManager.HEALING_ITEM_IMAGE);
         ImageManager.CLASSNAME_IMAGE_MAP.put(BombSupplyItem.class.getName(), ImageManager.BOMB_ITEM_IMAGE);
         ImageManager.CLASSNAME_IMAGE_MAP.put(FireSupplyItem.class.getName(), ImageManager.BULLET_ITEM_IMAGE);
-    }
-
-    public void gameOver(int score) {
-        Intent showRank = new Intent(MainActivity.this, RankActivity.class);
     }
 }

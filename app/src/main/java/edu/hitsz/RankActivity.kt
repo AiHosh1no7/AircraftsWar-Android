@@ -2,23 +2,29 @@ package edu.hitsz
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import edu.hitsz.dao.Player
+import edu.hitsz.dao.PlayerDAO
 import java.io.*
 import java.util.*
 
 
 class RankActivity : AppCompatActivity() {
     private val playerList: MutableList<Player> = LinkedList()
+    private val diff: Int = MainActivity.diff
 
     private fun readPlayerList() {
         playerList.clear()
         try {
-            val fis = openFileInput("rank")
+            val fis = when(diff) {
+                0 -> openFileInput("rankEasy")
+                1 -> openFileInput("rankMedium")
+                2 -> openFileInput("rankHard")
+                else -> null
+            }
             val ois = ObjectInputStream(fis)
             while (true) {
                 val player = ois.readObject() as Player
@@ -45,14 +51,19 @@ class RankActivity : AppCompatActivity() {
         savePlayerList()
     }
 
-    fun deletePlayer(playerIndex: Int) {
+    private fun deletePlayer(playerIndex: Int) {
         playerList.removeAt(playerIndex)
         savePlayerList()
     }
 
     private fun savePlayerList() {
         try {
-            val fos = openFileOutput("rank", MODE_PRIVATE)
+            val fos = when(diff) {
+                0 -> openFileOutput("rankEasy", MODE_PRIVATE)
+                1 -> openFileOutput("rankMedium", MODE_PRIVATE)
+                2 -> openFileOutput("rankHard", MODE_PRIVATE)
+                else -> null
+            }
             val oos = ObjectOutputStream(fos)
             for (player in playerList) {
                 oos.writeObject(player)
@@ -76,6 +87,12 @@ class RankActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rank)
+        title = when(diff) {
+            0 -> "Easy难度排行榜"
+            1 -> "Medium难度排行榜"
+            2 -> "Hard难度排行榜"
+            else -> "这是什么难度"
+        }
         val prevIntent: Intent = intent
         val scoreThisTime = prevIntent.getIntExtra("score",-1)
         val playerID = prevIntent.getStringExtra("id")

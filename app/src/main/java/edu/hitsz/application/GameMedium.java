@@ -1,8 +1,10 @@
 package edu.hitsz.application;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 
 import edu.hitsz.MainActivity;
+import edu.hitsz.R;
 
 public class GameMedium extends Game{
     private double shootPeriodRate = 0.8;
@@ -29,6 +31,8 @@ public class GameMedium extends Game{
         if(bossScore >= bossGenerationLimit && bossGenerationFlag) {
             if(MainActivity.bgmFlag) {
                 stopMusic(bgmPlayer);
+                bgmPlayer = MediaPlayer.create(context, R.raw.bgm);
+                bgmPlayer.setVolume(1, 1);
                 bossBgmPlayer.start();
                 bossBgmPlayer.setLooping(true);
             }
@@ -43,7 +47,7 @@ public class GameMedium extends Game{
                     bossHp
             ));
         }
-        if(eliteGenerationFlag == eliteGenerationLimit) {
+        if(eliteGenerationFlag >= eliteGenerationLimit) {
             eliteGenerationFlag = 0;
             if(enemyAircrafts.size() < enemyMaxNumber) {
                 enemyAircrafts.add(eliteFactory.createEnemy(
@@ -56,7 +60,7 @@ public class GameMedium extends Game{
             }
         }
         // 新敌机产生
-        if(mobGenerationFlag == mobGenerationLimit) {
+        if(mobGenerationFlag >= mobGenerationLimit) {
             mobGenerationFlag = 0;
             if (enemyAircrafts.size() < enemyMaxNumber) {
                 enemyAircrafts.add(mobFactory.createEnemy(

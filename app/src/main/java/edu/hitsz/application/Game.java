@@ -2,13 +2,9 @@ package edu.hitsz.application;
 
 import edu.hitsz.MainActivity;
 import edu.hitsz.R;
-import edu.hitsz.RankActivity;
 import edu.hitsz.aircraft.*;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.basic.AbstractFlyingObject;
-import edu.hitsz.dao.Player;
-import edu.hitsz.dao.PlayerDAO;
-import edu.hitsz.dao.PlayerDAOImpl;
 import edu.hitsz.factory.*;
 import edu.hitsz.item.AbstractItem;
 
@@ -17,20 +13,15 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.provider.MediaStore;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -111,13 +102,17 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         super(context);
         this.context = context;
         bgmPlayer = MediaPlayer.create(context, R.raw.bgm);
+        bgmPlayer.setVolume(1, 1);
         bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
-        mSoundPool = new SoundPool(4, AudioManager.STREAM_SYSTEM, 5);
+        bossBgmPlayer.setVolume(1, 1);
+        mSoundPool = new SoundPool(5, AudioManager.STREAM_SYSTEM, 5);
         soundID.put(1, mSoundPool.load(context, R.raw.bullet_hit, 1));
         soundID.put(2, mSoundPool.load(context, R.raw.game_over, 1));
         soundID.put(3, mSoundPool.load(context, R.raw.bomb_explosion, 1));
         soundID.put(4, mSoundPool.load(context, R.raw.bullet, 1));
         soundID.put(5, mSoundPool.load(context, R.raw.get_supply, 1));
+        soundID.put(6, mSoundPool.load(context, R.raw.bgm, 1));
+        soundID.put(7, mSoundPool.load(context, R.raw.bgm_boss, 1));
         mbLoop = true;
         mPaint = new Paint();  //设置画笔
         mSurfaceHolder = this.getHolder();
@@ -184,23 +179,23 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void playBullet(){
-        mSoundPool.play(soundID.get(4), 1, 1, 0,0,1);
+        mSoundPool.play(soundID.get(4), 0.5f, 0.5f, 0,0,1);
     }
 
     public void playGameOver(){
-        mSoundPool.play(soundID.get(2), 1, 1, 0, 0, 1);
+        mSoundPool.play(soundID.get(2), 0.5f, 0.5f, 0, 0, 1);
     }
 
     public void playBulletHit() {
-        mSoundPool.play(soundID.get(1), 1, 1, 0, 0, 1);
+        mSoundPool.play(soundID.get(1), 0.5f, 0.5f, 0, 0, 1);
     }
 
     public void playBombExplosion() {
-        mSoundPool.play(soundID.get(3), 1, 1, 0, 0, 1);
+        mSoundPool.play(soundID.get(3), 0.5f, 0.5f, 0, 0, 1);
     }
 
     public void playGetSupply() {
-        mSoundPool.play(soundID.get(5), 1, 1, 0, 0, 1);
+        mSoundPool.play(soundID.get(5), 0.5f, 0.5f, 0, 0, 1);
     }
 
     /**
@@ -219,7 +214,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
             // 周期性执行（控制频率）
             if (timeCountAndNewCycleJudge()) {
-                System.out.println(time);
+                // System.out.println(time);
                 generateEnemy();
                 // 飞机射出子弹
                 shootAction();
@@ -240,6 +235,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             // 后处理
             postProcessAction();
 
+            System.out.println(heroAircraft.getHp());
+
             // 游戏结束检查
             if (heroAircraft.getHp() <= 0) {
                 // 游戏结束
@@ -249,10 +246,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                     stopMusic(bossBgmPlayer);
                     playGameOver();
                 }
-                executorService.shutdown();
                 gameOverFlag = true;
+                System.out.println(gameOverFlag);
+                executorService.shutdown();
                 System.out.println("Game Over!");
-                Toast.makeText(context, "GAME OVER!\nTouch to continue.", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -261,7 +258,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
          * 本次任务执行完成后，需要延迟设定的延迟时间，才会执行新的任务
          */
         executorService.scheduleWithFixedDelay(task, timeInterval, timeInterval, TimeUnit.MILLISECONDS);
-
     }
 
     //***********************
@@ -365,19 +361,21 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                         // 获得分数，产生道具补给
                         if(enemyAircraft.eliteFlag) {
                             score += 20;
-                            bossScore += 20;
+                            bossScore += bossGenerationFlag ? 20 : 0;
                         } else if(enemyAircraft.bossFlag) {
                             score += 50;
-                            bossScore += 50;
+                            bossScore += 0;
                         } else {
                             score += 10;
-                            bossScore += 10;
+                            bossScore += bossGenerationFlag ? 10 : 0;
                         }
                         if(enemyAircraft.bossFlag) {
                             bossGenerationFlag = true;
 
                             if(MainActivity.bgmFlag) {
                                 stopMusic(bossBgmPlayer);
+                                bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
+                                bossBgmPlayer.setVolume(1, 1);
                                 bgmPlayer.start();
                                 bgmPlayer.setLooping(true);
                             }
@@ -465,7 +463,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         backGroundTop += 1;
 
-        if(backGroundTop == MainActivity.screenHeight) {
+        if(backGroundTop == ImageManager.BACKGROUND_IMAGE.getHeight()) {
             backGroundTop = 0;
         }
 
