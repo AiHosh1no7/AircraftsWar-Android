@@ -65,5 +65,13 @@
             android:text="Audio"
             android:textSize="34sp"
             android:typeface="sans" />
+
+        <Switch
+            android:id="@+id/networkSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="97dp"
+            android:text="Online"
+            android:textSize="34sp"
+            android:typeface="sans" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
