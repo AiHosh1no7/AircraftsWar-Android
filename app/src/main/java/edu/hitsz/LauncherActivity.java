@@ -19,12 +19,21 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
+import edu.hitsz.dao.Player;
 import edu.hitsz.databinding.ActivityLauncherBinding;
 import edu.hitsz.socket.PlayerStatus;
 
@@ -39,7 +48,7 @@ public class LauncherActivity extends AppCompatActivity {
 
     public Socket socket;
     public PlayerStatus localPlayer;
-    public PlayerStatus opposite;
+    public PlayerStatus rivalPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,46 +65,11 @@ public class LauncherActivity extends AppCompatActivity {
         binding.appBarLauncher.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!networkSwitch.isChecked()) {
-                    Intent startGame = new Intent(LauncherActivity.this, MainActivity.class);
-                    switch (diffChoice.getCheckedRadioButtonId()) {
-                        case R.id.easyButton: {
-                            startGame.putExtra("diff", 0);
-                            break;
-                        }
-                        case R.id.mediumButton: {
-                            startGame.putExtra("diff", 1);
-                            break;
-                        }
-                        case R.id.hardButton: {
-                            startGame.putExtra("diff", 2);
-                            break;
-                        }
-                    }
-                    startGame.putExtra("audio", audioSwitch.isChecked());
-                    startActivity(startGame);
-                } else {
-                    showWaitingDialog();
-                    new Thread(new NetConn()).start();
-                    while(opposite == null);
-                    Intent startGame = new Intent(LauncherActivity.this, MainActivity.class);
-                    switch (diffChoice.getCheckedRadioButtonId()) {
-                        case R.id.easyButton: {
-                            startGame.putExtra("diff", 0);
-                            break;
-                        }
-                        case R.id.mediumButton: {
-                            startGame.putExtra("diff", 1);
-                            break;
-                        }
-                        case R.id.hardButton: {
-                            startGame.putExtra("diff", 2);
-                            break;
-                        }
-                    }
-                    startGame.putExtra("audio", audioSwitch.isChecked());
-                    startActivity(startGame);
+                if(networkSwitch.isChecked()) {
+                    ProgressDialog waiting = showWaitingDialog();
+                    connecting();
                 }
+                startGameActivity();
             }
         });
         DrawerLayout drawer = binding.drawerLayout;
@@ -125,33 +99,97 @@ public class LauncherActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    public void showWaitingDialog() {
+    public ProgressDialog showWaitingDialog() {
         ProgressDialog waiting = new ProgressDialog(this);
         waiting.setTitle("等待玩家连接");
         waiting.setMessage("少女祈祷中");
         waiting.setCancelable(false);
         waiting.setIndeterminate(true);
         waiting.show();
+
+        return waiting;
     }
 
-    protected class NetConn extends Thread {
-        @Override
-        public void run() {
-            try {
+    public void sendLocalMessage(PlayerStatus player) {
+        try {
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+            writer.println("Player START");
+            writer.println(player.getPlayerID());
+            writer.println(player.getPlayerScore());
+            writer.println(player.getPlayerReady());
+            writer.println("Player END");
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void connecting() {
+        Callable<PlayerStatus> callable = new Callable<PlayerStatus>() {
+            @Override
+            public PlayerStatus call() throws Exception {
                 socket = new Socket();
-                socket.connect(new InetSocketAddress("10.250.152.127",9999), 5000);
+                try {
+                    socket.connect(new InetSocketAddress("10.250.152.127", 9999), 5000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 localPlayer = new PlayerStatus();
                 localPlayer.setPlayerID("test");
+                sendLocalMessage(localPlayer);
+                return receiveRivalMessage();
+            }
+        };
+        FutureTask<PlayerStatus> task = new FutureTask<>(callable);
+        new Thread(task).start();
 
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(localPlayer);
-                oos.close();
+        try {
+            rivalPlayer = task.get();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                opposite = (PlayerStatus) ois.readObject();
-            } catch(Exception e) {
-                e.printStackTrace();
+    public PlayerStatus receiveRivalMessage() {
+        PlayerStatus player = new PlayerStatus();
+        String content;
+        try {
+            BufferedReader b_in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            while((content = b_in.readLine()) != null) {
+                if(content.equals("Player START")) {
+                    player.setPlayerID(b_in.readLine());
+                    player.setPlayerScore(Integer.parseInt(b_in.readLine()));
+                    player.setPlayerReady(Boolean.parseBoolean(b_in.readLine()));
+                    if(b_in.readLine().equals("Player END")) {
+                        return player;
+                    }
+                } else if(content.equals("WAITING")) {
+                    continue;
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void startGameActivity() {
+        Intent startGame = new Intent(LauncherActivity.this, MainActivity.class);
+        switch (diffChoice.getCheckedRadioButtonId()) {
+            case R.id.easyButton: {
+                startGame.putExtra("diff", 0);
+                break;
+            }
+            case R.id.mediumButton: {
+                startGame.putExtra("diff", 1);
+                break;
+            }
+            case R.id.hardButton: {
+                startGame.putExtra("diff", 2);
+                break;
             }
         }
+        startGame.putExtra("audio", audioSwitch.isChecked());
+        startGame.putExtra("online", networkSwitch.isChecked());
+        startActivity(startGame);
     }
 }
