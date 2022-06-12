@@ -1,13 +1,21 @@
 package edu.hitsz.application;
 
+import edu.hitsz.LauncherActivity;
 import edu.hitsz.MainActivity;
 import edu.hitsz.R;
 import edu.hitsz.aircraft.*;
 import edu.hitsz.bullet.BaseBullet;
 import edu.hitsz.basic.AbstractFlyingObject;
+import edu.hitsz.dao.Player;
 import edu.hitsz.factory.*;
 import edu.hitsz.item.AbstractItem;
+import edu.hitsz.socket.PlayerStatus;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -55,6 +63,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     private final HealingItemFactory healingItemFactory = new HealingItemFactory();
     private final FireSupplyItemFactory fireSupplyItemFactory = new FireSupplyItemFactory();
     private final BombSupplyItemFactory bombSupplyItemFactory = new BombSupplyItemFactory();
+    public boolean onlineMode;
+    private PlayerStatus rivalPlayer;
 
     int enemyMaxNumber = 5;
 
@@ -235,10 +245,15 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
             // 后处理
             postProcessAction();
 
+            // 联机通讯
+            if(onlineMode) {
+                communicationAction();
+            }
+
             System.out.println(heroAircraft.getHp());
 
             // 游戏结束检查
-            if (heroAircraft.getHp() <= 0) {
+            if ((!onlineMode && heroAircraft.getHp() <= 0) || (onlineMode && (!rivalPlayer.getPlayerReady() || heroAircraft.getHp() <= 0))) {
                 // 游戏结束
 
                 if(MainActivity.bgmFlag) {
@@ -247,7 +262,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                     playGameOver();
                 }
                 gameOverFlag = true;
-                System.out.println(gameOverFlag);
                 executorService.shutdown();
                 System.out.println("Game Over!");
             }
@@ -273,6 +287,48 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         } else {
             return false;
         }
+    }
+
+    private void communicationAction() {
+        PlayerStatus localPlayer = new PlayerStatus("test", score, heroAircraft.getHp() > 0 ? true : false);
+        sendLocalMessage(localPlayer);
+        rivalPlayer = receiveRivalMessage();
+    }
+
+    public void sendLocalMessage(PlayerStatus player) {
+        try {
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(LauncherActivity.socket.getOutputStream())), true);
+            writer.println("Player START");
+            writer.println(player.getPlayerID());
+            writer.println(player.getPlayerScore());
+            writer.println(player.getPlayerReady());
+            writer.println("Player END");
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public PlayerStatus receiveRivalMessage() {
+        PlayerStatus player = new PlayerStatus("", 0, false);
+        String content;
+        try {
+            BufferedReader b_in = new BufferedReader(new InputStreamReader(LauncherActivity.socket.getInputStream()));
+            while((content = b_in.readLine()) != null) {
+                if(content.equals("Player START")) {
+                    player.setPlayerID(b_in.readLine());
+                    player.setPlayerScore(Integer.parseInt(b_in.readLine()));
+                    player.setPlayerReady(Boolean.parseBoolean(b_in.readLine()));
+                    if(b_in.readLine().equals("Player END")) {
+                        return player;
+                    }
+                } else if(content.equals("WAITING")) {
+                    continue;
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void shootAction() {
@@ -505,18 +561,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         canvas.drawText("SCORE:" + this.score, x, y, textPaint);
         y = y + 100;
         canvas.drawText("LIFE:" + this.heroAircraft.getHp(), x, y, textPaint);
-    }
 
-    private void paintGameOver() {
-        int x = MainActivity.screenWidth / 2;
-        int y = MainActivity.screenHeight / 2;
-        Paint textPaint = new Paint();
-        textPaint.setStyle(Paint.Style.FILL);
-        textPaint.setStrokeWidth(12);
-        textPaint.setTextSize(200);
-        textPaint.setColor(Color.parseColor("red"));
-        canvas.drawText("GAME OVER", x, y, textPaint);
-        y = y + 500;
-        canvas.drawText("Touch to continue.", x, y, textPaint);
+        if(onlineMode) {
+            y = y + 100;
+            canvas.drawText("RIVAL SCORE:" + rivalPlayer.getPlayerScore(), x, y, textPaint);
+        }
     }
 }

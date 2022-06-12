@@ -46,7 +46,7 @@ public class LauncherActivity extends AppCompatActivity {
     private Switch audioSwitch;
     private Switch networkSwitch;
 
-    public Socket socket;
+    public static Socket socket;
     public PlayerStatus localPlayer;
     public PlayerStatus rivalPlayer;
 
@@ -129,12 +129,11 @@ public class LauncherActivity extends AppCompatActivity {
             public PlayerStatus call() throws Exception {
                 socket = new Socket();
                 try {
-                    socket.connect(new InetSocketAddress("10.250.152.127", 9999), 5000);
+                    socket.connect(new InetSocketAddress("10.249.58.38", 9999), 5000);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                localPlayer = new PlayerStatus();
-                localPlayer.setPlayerID("test");
+                localPlayer = new PlayerStatus("test", 0, true);
                 sendLocalMessage(localPlayer);
                 return receiveRivalMessage();
             }
@@ -150,7 +149,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     public PlayerStatus receiveRivalMessage() {
-        PlayerStatus player = new PlayerStatus();
+        PlayerStatus player = new PlayerStatus("", 0, false);
         String content;
         try {
             BufferedReader b_in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

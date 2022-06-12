@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 vGame = new GameHard(this);
                 break;
         }
+        vGame.onlineMode = prevIntent.getBooleanExtra("online", false);
         System.out.println("Game Activity has been created.");
         setContentView(vGame);
         vGame.action();
