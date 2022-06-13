@@ -66,6 +66,21 @@
             android:textSize="34sp"
             android:typeface="sans" />
 
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <EditText
+            android:id="@+id/playerIdText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Your ID"
+            android:textAlignment="center" />
+
         <Switch
             android:id="@+id/networkSwitch"
             android:layout_width="wrap_content"
@@ -73,5 +88,6 @@
             android:text="Online"
             android:textSize="34sp"
             android:typeface="sans" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

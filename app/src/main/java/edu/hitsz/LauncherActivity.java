@@ -3,11 +3,13 @@ package edu.hitsz;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -45,10 +47,12 @@ public class LauncherActivity extends AppCompatActivity {
     private RadioGroup diffChoice;
     private Switch audioSwitch;
     private Switch networkSwitch;
+    private TextView playerIdText;
 
     public static Socket socket;
     public PlayerStatus localPlayer;
-    public PlayerStatus rivalPlayer;
+    public static PlayerStatus rivalPlayer;
+    public static String playerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +64,13 @@ public class LauncherActivity extends AppCompatActivity {
         diffChoice = findViewById(R.id.diffGroup);
         audioSwitch = findViewById(R.id.audioSwitch);
         networkSwitch = findViewById(R.id.networkSwitch);
+        playerIdText = findViewById(R.id.playerIdText);
 
         setSupportActionBar(binding.appBarLauncher.toolbar);
         binding.appBarLauncher.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                playerName = playerIdText.getText().toString();
                 if(networkSwitch.isChecked()) {
                     ProgressDialog waiting = showWaitingDialog();
                     connecting();
@@ -133,7 +139,8 @@ public class LauncherActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                localPlayer = new PlayerStatus("test", 0, true);
+                localPlayer = new PlayerStatus(playerName, 0, true);
+                System.out.println(localPlayer.getPlayerScore());
                 sendLocalMessage(localPlayer);
                 return receiveRivalMessage();
             }
@@ -146,6 +153,9 @@ public class LauncherActivity extends AppCompatActivity {
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println("RIVAL INFO----------");
+        System.out.println(rivalPlayer.getPlayerScore());
     }
 
     public PlayerStatus receiveRivalMessage() {

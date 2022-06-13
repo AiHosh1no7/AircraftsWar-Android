@@ -22,8 +22,8 @@ public class GameEasy extends Game{
             eliteGenerationFlag = 0;
             if(enemyAircrafts.size() < enemyMaxNumber) {
                 enemyAircrafts.add(eliteFactory.createEnemy(
-                        (int) ( Math.random() * (MainActivity.screenWidth - ImageManager.MOB_ENEMY_IMAGE.getWidth()))*1,
-                        (int) (Math.random() * MainActivity.screenHeight * 0.2)*1,
+                        (int) ( Math.random() * (MainActivity.screenWidth - ImageManager.MOB_ENEMY_IMAGE.getWidth())) * 1,
+                        (int) (Math.random() * MainActivity.screenHeight * 0.2) * 1,
                         Math.random() > 0.3 ? 4 : 0,
                         4,
                         200

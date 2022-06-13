@@ -123,6 +123,12 @@ class RankActivity : AppCompatActivity() {
             playerDate.text = player.dateTime
             newRow.addView(playerDate)
 
+            val button = findViewById<Button>(R.id.backToMenuButton)
+            val backToMenu = Intent(this@RankActivity, LauncherActivity::class.java)
+            button.setOnClickListener {
+                startActivity(backToMenu)
+            }
+
             newRow.setOnClickListener {
                 val builder = AlertDialog.Builder(this@RankActivity)
                 builder.setTitle("删除记录")
@@ -132,7 +138,7 @@ class RankActivity : AppCompatActivity() {
                     scoreTable.removeView(tableRow)
                     deletePlayer(playerList.indexOf(player))
                 }
-                builder.setNegativeButton("取消") { gialog, which ->
+                builder.setNegativeButton("取消") { dialog, which ->
                     return@setNegativeButton
                 }
                 builder.show()

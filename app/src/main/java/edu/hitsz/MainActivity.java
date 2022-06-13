@@ -16,6 +16,11 @@ import android.view.MotionEvent;
 import android.content.ServiceConnection;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
 import edu.hitsz.aircraft.BossEnemy;
 import edu.hitsz.aircraft.EliteEnemy;
 import edu.hitsz.aircraft.HeroAircraft;
@@ -86,11 +91,21 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
             vGame.heroAircraft.setLocation(x, y);
-            Log.i(TAG, "Now HeroAircraft Location:" + vGame.heroAircraft.getLocationX() + " " + vGame.heroAircraft.getLocationY());
-        } else if(vGame.gameOverFlag) {
+        } else if(vGame.gameOverFlag && !vGame.onlineMode) {
             Intent showRank = new Intent(MainActivity.this, InputActivity.class);
             showRank.putExtra("currentScore", vGame.score);
             startActivity(showRank);
+        } else if(vGame.gameOverFlag && vGame.onlineMode) {
+            try {
+                PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(LauncherActivity.socket.getOutputStream())), true);
+                writer.println("BYE");
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            Intent showCheck = new Intent(MainActivity.this, OnlineCheckActivity.class);
+            showCheck.putExtra("victoryFlag", vGame.victoryFlag);
+            startActivity(showCheck);
+            this.finish();
         }
 
         return true;

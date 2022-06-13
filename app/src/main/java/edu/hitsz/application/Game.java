@@ -13,9 +13,12 @@ import edu.hitsz.socket.PlayerStatus;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -65,6 +68,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     private final BombSupplyItemFactory bombSupplyItemFactory = new BombSupplyItemFactory();
     public boolean onlineMode;
     private PlayerStatus rivalPlayer;
+    public boolean victoryFlag;
 
     int enemyMaxNumber = 5;
 
@@ -107,6 +111,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mSurfaceHolder;
     private Canvas canvas;  //绘图的画布
     private Paint mPaint;
+    private Socket socket;
 
     public Game(Context context) {
         super(context);
@@ -208,10 +213,28 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         mSoundPool.play(soundID.get(5), 0.5f, 0.5f, 0, 0, 1);
     }
 
+    public void connecting() {
+        Runnable conn = new Runnable() {
+            @Override
+            public void run() {
+                socket = new Socket();
+                try {
+                    socket.connect(new InetSocketAddress("10.249.58.38", 9999), 5000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(conn).start();
+    }
+
     /**
      * 游戏启动入口，执行游戏逻辑
      */
     public void action() {
+        // connecting();
+
         if(MainActivity.bgmFlag) {
             bgmPlayer.start();
             bgmPlayer.setLooping(true);
@@ -220,6 +243,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         // 定时任务：绘制、对象产生、碰撞判定、击毁及结束判定
         Runnable task = () -> {
 
+            System.out.println(time);
             time += timeInterval;
 
             // 周期性执行（控制频率）
@@ -250,12 +274,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 communicationAction();
             }
 
-            System.out.println(heroAircraft.getHp());
-
             // 游戏结束检查
             if ((!onlineMode && heroAircraft.getHp() <= 0) || (onlineMode && (!rivalPlayer.getPlayerReady() || heroAircraft.getHp() <= 0))) {
                 // 游戏结束
-
+                victoryFlag = !(heroAircraft.getHp() <= 0);
                 if(MainActivity.bgmFlag) {
                     stopMusic(bgmPlayer);
                     stopMusic(bossBgmPlayer);
@@ -290,7 +312,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void communicationAction() {
-        PlayerStatus localPlayer = new PlayerStatus("test", score, heroAircraft.getHp() > 0 ? true : false);
+        PlayerStatus localPlayer = new PlayerStatus(LauncherActivity.playerName, score, heroAircraft.getHp() > 0 ? true : false);
         sendLocalMessage(localPlayer);
         rivalPlayer = receiveRivalMessage();
     }
@@ -564,6 +586,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         if(onlineMode) {
             y = y + 100;
+            if(rivalPlayer == null) {
+                rivalPlayer = LauncherActivity.rivalPlayer;
+            }
             canvas.drawText("RIVAL SCORE:" + rivalPlayer.getPlayerScore(), x, y, textPaint);
         }
     }
